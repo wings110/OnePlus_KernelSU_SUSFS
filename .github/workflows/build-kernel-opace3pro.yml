@@ -76,7 +76,7 @@ jobs:
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -
           cd ./KernelSU-Next/kernel
-          sed -i 's/ccflags-y += -DKSU_VERSION=16/ccflags-y += -DKSU_VERSION=12321/' ./Makefile
+          sed -i 's/ccflags-y += -DKSU_VERSION=16/ccflags-y += -DKSU_VERSION=${KSU_VERSION}/' ./Makefile
           
       - name: Apply SUSFS Patches
         run: |
@@ -146,7 +146,8 @@ jobs:
           echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> ./common/arch/arm64/configs/gki_defconfig
-          
+          echo 'CONFIG_LOCALVERSION="-Wings110-gki@KernelSU-Next+SUSFS"' >> ./common/arch/arm64/configs/gki_defconfig
+          echo "# CONFIG_LOCALVERSION_AUTO is not set" >> ./common/arch/arm64/configs/gki_defconfig          
           # Add additional tmpfs config setting
           echo "CONFIG_TMPFS_XATTR=y" >> ./common/arch/arm64/configs/gki_defconfig
 
@@ -157,11 +158,13 @@ jobs:
           
           echo "Running sed commands..."
           
-          # Run sed commands for modifications
-          sed -i 's/check_defconfig//' ./common/build.config.gki
-          sed -i '$s|echo "\$res"|echo "\$res-Wild+"|' ./common/scripts/setlocalversion
-          sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
-          sed -i 's/-dirty//' ./common/scripts/setlocalversion
+          # Remove defconfig check
+          sed -i '2s/check_defconfig//' ./common/build.config.gki
+          # Custom Kernel Name
+          sed -i "s/'%s' -dirty/'%s'/" msm-kernel/scripts/setlocalversion
+          sed -i 's/cut -c1-12/cut -c1-8/' msm-kernel/scripts/setlocalversion
+          sed -i "s/'%s' -dirty/'%s'/" common/scripts/setlocalversion
+          sed -i 's/cut -c1-12/cut -c1-8/' common/scripts/setlocalversion
 
           # Run perl command to modify UTS_VERSION
           perl -pi -e 's{UTS_VERSION="\$\(echo \$UTS_VERSION \$CONFIG_FLAGS \$TIMESTAMP \| cut -b -\$UTS_LEN\)"}{UTS_VERSION="#1 SMP PREEMPT Sat Apr 20 04:20:00 UTC 2024"}' ./common/scripts/mkcompile_h
@@ -172,18 +175,24 @@ jobs:
           name: oplus_setup_file  # Name of the artifact
           path: ./$CONFIG/kernel_platform/oplus/build/oplus_setup.sh  # Path to the file
       
-      - name: Build the Kernel
+      - name: Build Kernel
+        working-directory: builds/${{ env.ROOT_DIR }}/kernel_platform/oneplus_ace3_pro_v/
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          
-          echo "Building the kernel..."
-          rm -rf ./kernel_platform/common/android/abi_gki_protected_exports_*
-          #git config --global user.email "bins4us@hotmail.com"
-          #git config --global user.name "TheWildJames"
-          #git add *
-          #git commit -s -a -m "getting rid of -dirty"
-          ./kernel_platform/oplus/build/oplus_build_kernel.sh pineapple gki
+          cd kernel_platform
+          mkdir out
+          export PATH="/usr/lib/ccache:$PATH"
+          # Modified build command with correct syntax
+          ./build_with_bazel.py \
+              -t pineapple \
+              gki \
+              --jobs=$(nproc --all) \
+              --verbose_failures \
+              --nokleaf_localversion \
+              --config=stamp \
+              --user_kmi_symbol_lists=//msm-kernel:android/abi_gki_aarch64_qcom \
+              --lto=thin \  # 启用 thin LTO
+              --ignore_missing_projects \
+              -o "$(pwd)/out"
 
       - name: Create Bootimgs Folder and Copy Images
         run: |
