@@ -81,7 +81,7 @@ jobs:
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG/kernel_platform"
+          cd ../..
           
           echo "Applying SUSFS patches..."
           
@@ -103,7 +103,7 @@ jobs:
       - name: Apply Next-SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG/kernel_platform"
+          cd ..
           
           echo "Applying next SUSFS patches..."
           cp ../../kernel_patches/apk_sign.c_fix.patch ./
@@ -116,7 +116,7 @@ jobs:
       - name: Apply Hide Stuff Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG/kernel_platform/common"
+          cd ./common
           # Apply additional patch
           cp ../../../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch || true
@@ -124,7 +124,7 @@ jobs:
       - name: Add SUSFS Configuration Settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG/kernel_platform"
+          cd ..
           
           echo "Adding configuration settings to gki_defconfig..."
           
@@ -154,12 +154,12 @@ jobs:
       - name: Run sed and perl Commands
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG/kernel_platform"
+          # cd "$CONFIG/kernel_platform"
           
           echo "Running sed commands..."
           
           # Remove defconfig check
-          sed -i '2s/check_defconfig//' ./common/build.config.gki
+          sed -i 's/check_defconfig//' ./common/build.config.gki
           # Custom Kernel Name
           sed -i "s/'%s' -dirty/'%s'/" msm-kernel/scripts/setlocalversion
           sed -i 's/cut -c1-12/cut -c1-8/' msm-kernel/scripts/setlocalversion
@@ -181,7 +181,7 @@ jobs:
           echo "Building the kernel..."
           # Modified build command with correct syntax
           rm -rf ./kernel_platform/common/android/abi_gki_protected_exports_*
-          cd "$CONFIG/kernel_platform"
+          # cd "$CONFIG/kernel_platform"
           ./build_with_bazel.py \
               -t pineapple \
               gki \
