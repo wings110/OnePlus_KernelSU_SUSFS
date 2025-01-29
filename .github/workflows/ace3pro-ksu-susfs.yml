@@ -1,4 +1,4 @@
-name: Build OnePlus Ace 3 Pro Android 14 6.1 Kernel
+name: Ace 3 Pro Android 14 6.1 Kernel
 
 on:
   workflow_call:  # This allows this workflow to be called from another workflow
@@ -124,7 +124,7 @@ jobs:
       - name: Add SUSFS Configuration Settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd cd "$CONFIG/kernel_platform"
+          cd "$CONFIG/kernel_platform"
           
           # Add SUSFS configuration settings
           echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
