@@ -175,7 +175,7 @@ jobs:
       
       - name: Build Kernel
         run: |
-          echo "Changing to configuration directory: $CONFIG..
+          echo "Changing to configuration directory: $CONFIG.."
           mkdir out
           
           # Modified build command with correct syntax
