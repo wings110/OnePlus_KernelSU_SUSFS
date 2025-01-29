@@ -81,7 +81,7 @@ jobs:
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd ../..
+          cd "$CONFIG/kernel_platform"
           
           echo "Applying SUSFS patches..."
           
@@ -103,7 +103,7 @@ jobs:
       - name: Apply Next-SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd ..
+          cd "$CONFIG/kernel_platform"
           
           echo "Applying next SUSFS patches..."
           cp ../../kernel_patches/apk_sign.c_fix.patch ./
@@ -116,7 +116,7 @@ jobs:
       - name: Apply Hide Stuff Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd ./common
+          cd "$CONFIG/kernel_platform/common"
           # Apply additional patch
           cp ../../../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch || true
@@ -124,9 +124,7 @@ jobs:
       - name: Add SUSFS Configuration Settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd ..
-          
-          echo "Adding configuration settings to gki_defconfig..."
+          cd cd "$CONFIG/kernel_platform"
           
           # Add SUSFS configuration settings
           echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
@@ -154,7 +152,7 @@ jobs:
       - name: Run sed and perl Commands
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          # cd "$CONFIG/kernel_platform"
+          cd "$CONFIG/kernel_platform"
           
           echo "Running sed commands..."
           
@@ -177,11 +175,12 @@ jobs:
       
       - name: Build Kernel
         run: |
+          echo "Changing to configuration directory: $CONFIG..
           mkdir out
-          echo "Building the kernel..."
+          
           # Modified build command with correct syntax
           rm -rf ./kernel_platform/common/android/abi_gki_protected_exports_*
-          # cd "$CONFIG/kernel_platform"
+          cd "$CONFIG/kernel_platform"
           ./build_with_bazel.py \
               -t pineapple \
               gki \
