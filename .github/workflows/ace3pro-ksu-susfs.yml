@@ -177,12 +177,15 @@ jobs:
           path: ./$CONFIG/kernel_platform/oplus/build/oplus_setup.sh  # Path to the file
       
       - name: Build Kernel
-        working-directory: builds/${{ env.ROOT_DIR }}/kernel_platform/oneplus_ace3_pro_v/
-        run: |
-          cd kernel_platform
+	-
+          echo "Changing to configuration directory: $CONFIG..."
+
+          cd "$CONFIG"
           mkdir out
-          export PATH="/usr/lib/ccache:$PATH"
+          echo "Building the kernel..."
           # Modified build command with correct syntax
+          rm -rf ./kernel_platform/common/android/abi_gki_protected_exports_*
+          export PATH="/usr/lib/ccache:$PATH"
           ./build_with_bazel.py \
               -t pineapple \
               gki \
