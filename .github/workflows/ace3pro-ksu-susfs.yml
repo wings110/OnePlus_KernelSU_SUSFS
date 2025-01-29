@@ -7,7 +7,6 @@ on:
 jobs:
   build-kernel-a14-6-1-kernelsu-susfs:
     runs-on: ubuntu-22.04
-
     steps:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
@@ -177,15 +176,13 @@ jobs:
           path: ./$CONFIG/kernel_platform/oplus/build/oplus_setup.sh  # Path to the file
       
       - name: Build Kernel
-	-
+        run: |
           echo "Changing to configuration directory: $CONFIG..."
-
           cd "$CONFIG"
           mkdir out
           echo "Building the kernel..."
           # Modified build command with correct syntax
           rm -rf ./kernel_platform/common/android/abi_gki_protected_exports_*
-          export PATH="/usr/lib/ccache:$PATH"
           ./build_with_bazel.py \
               -t pineapple \
               gki \
