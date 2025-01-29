@@ -1,8 +1,8 @@
 name: Build OnePlus Ace 3 Pro Android 14 6.1 Kernel
 
 on:
-   workflow_dispatch:
-  # workflow_call:  # This allows this workflow to be called from another workflow
+  workflow_call:  # This allows this workflow to be called from another workflow
+  workflow_dispatch:
   
 jobs:
   build-kernel-a14-6-1-kernelsu-susfs:
