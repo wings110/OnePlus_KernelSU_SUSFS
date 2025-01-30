@@ -184,7 +184,7 @@ jobs:
               --config=stamp \
               --user_kmi_symbol_lists=//msm-kernel:android/abi_gki_aarch64_qcom \
               --lto=thin \  # 启用 thin LTO
-              --ignore_missing_projects \
+              # --ignore_missing_projects \
               -o "$(pwd)/out"
 
       - name: Create Bootimgs Folder and Copy Images
