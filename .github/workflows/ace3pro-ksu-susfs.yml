@@ -6,7 +6,7 @@ on:
   
 jobs:
   build-kernel-a14-6-1-kernelsu-susfs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.0.4
     steps:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
